@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Generador de Memes</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <header class="app-header">
+        <h1>Generador de Memes</h1>
+    </header>
+
+    <div class="container">
+        <div class="meme-preview">
+            <canvas id="memeCanvas"></canvas>
+            <div id="noImageMessage">Carga una imagen para empezar</div>
+        </div>
+
+        <div class="controls">
+            <div class="input-group">
+                <label for="imageUpload" class="file-upload-button">Cargar Imagen</label>
+                <input type="file" id="imageUpload" accept="image/*">
+                <span id="fileName" class="file-name">Ningún archivo seleccionado</span>
+            </div>
+
+            <div class="input-group">
+                <label for="topText">Texto Superior:</label>
+                <input type="text" id="topText" placeholder="Texto superior">
+            </div>
+
+            <div class="input-group">
+                <label for="bottomText">Texto Inferior:</label>
+                <input type="text" id="bottomText" placeholder="Texto inferior">
+            </div>
+
+            <button id="downloadMeme">Descargar Meme</button>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+
+</body>
+</html>
