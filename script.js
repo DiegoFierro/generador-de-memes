@@ -59,7 +59,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         // --- Configuración y Estilo del Texto ---
         const baseFontSize = memeCanvas.height * 0.1; 
-        const fontFace = 'Impact';
+        const fontFace = 'Arial Black';
         const fontWeight = 'bold';
 
         ctx.font = `${fontWeight} ${baseFontSize}px ${fontFace}`;
