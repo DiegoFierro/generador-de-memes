@@ -73,7 +73,7 @@ body {
 }
 
 #memeCanvas {
-    display: block; /* Asegura que el canvas se muestre */
+    display: none; /* Oculto por defecto, se mostrará con .has-image */
     max-width: 100%; /* El canvas nunca debe ser más ancho que su contenedor */
     height: auto; /* Mantiene la relación de aspecto */
     width: 100%; /* El canvas debe ocupar todo el ancho disponible de su contenedor */
@@ -105,14 +105,14 @@ body {
 /* Reglas de visibilidad controladas por JS:
    Cuando .meme-preview tiene la clase .has-image, ocultar el mensaje y mostrar el canvas. */
 .meme-preview.has-image #noImageMessage {
-    display: none !important;
-    opacity: 0 !important;
-    visibility: hidden !important;
+    display: none;
+    opacity: 0;
+    visibility: hidden;
 }
 
 .meme-preview.has-image #memeCanvas {
     background-color: transparent; /* Quitar fondo temporal cuando hay imagen */
-    display: block !important;
+    display: block;
 }
 
 .controls {

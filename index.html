@@ -14,6 +14,7 @@
 
     <div class="container">
         <div class="meme-preview">
+            <div id="loadingIndicator" style="display: none; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); z-index: 3; background-color: rgba(255,255,255,0.8); padding: 20px; border-radius: 5px;">Loading image...</div>
             <canvas id="memeCanvas"></canvas>
             <div id="noImageMessage">Carga una imagen para empezar</div>
         </div>
@@ -33,6 +34,18 @@
             <div class="input-group">
                 <label for="bottomText">Texto Inferior:</label>
                 <input type="text" id="bottomText" placeholder="Texto inferior">
+            </div>
+
+            <div class="input-group">
+                <label for="topTextSize">Top Text Font Size:</label>
+                <input type="range" id="topTextSize" min="10" max="100" value="50">
+                <span id="topTextSizeValue">50px</span>
+            </div>
+
+            <div class="input-group">
+                <label for="bottomTextSize">Bottom Text Font Size:</label>
+                <input type="range" id="bottomTextSize" min="10" max="100" value="50">
+                <span id="bottomTextSizeValue">50px</span>
             </div>
 
             <button id="downloadMeme">Descargar Meme</button>
