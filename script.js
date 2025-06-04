@@ -8,27 +8,104 @@ document.addEventListener('DOMContentLoaded', () => {
     const noImageMessage = document.getElementById('noImageMessage');
     const memePreview = document.querySelector('.meme-preview');
     const fileNameSpan = document.getElementById('fileName'); // Elemento para mostrar el nombre del archivo
+    const loadingIndicator = document.getElementById('loadingIndicator'); // Referencia al nuevo elemento
+
+    // Nuevos elementos para tamaño de fuente
+    const topTextSizeInput = document.getElementById('topTextSize');
+    const topTextSizeValue = document.getElementById('topTextSizeValue');
+    const bottomTextSizeInput = document.getElementById('bottomTextSize');
+    const bottomTextSizeValue = document.getElementById('bottomTextSizeValue');
+
     const ctx = memeCanvas.getContext('2d');
 
-    let currentImage = null;
+    let currentImage = null; // Variable para almacenar la imagen cargada actualmente.
 
     /**
-     * Dibuja el meme en el canvas, incluyendo la imagen y los textos.
-     * También gestiona la visibilidad del canvas y del mensaje "no image".
+     * Gestiona la interfaz de usuario cuando no hay imagen cargada.
+     * Muestra el mensaje 'noImageMessage', oculta el canvas y ajusta clases CSS.
+     * @param {CanvasRenderingContext2D} ctx - El contexto 2D del canvas.
+     * @param {HTMLCanvasElement} canvasEl - El elemento HTML canvas.
+     * @param {HTMLElement} noImageMsgEl - El elemento HTML para mostrar el mensaje de "no imagen".
+     * @param {HTMLElement} memePreviewEl - El elemento HTML contenedor de la previsualización del meme.
+     */
+    const handleNoImageState = (ctx, canvasEl, noImageMsgEl, memePreviewEl) => {
+        console.log('  No image loaded. Displaying "no image" message.');
+        noImageMsgEl.style.display = 'flex';
+        canvasEl.style.display = 'none'; // Oculta el canvas
+        memePreviewEl.classList.remove('has-image');
+        ctx.clearRect(0, 0, canvasEl.width, canvasEl.height);
+        // Aseguramos que el canvas esté en un estado base cuando no hay imagen
+        canvasEl.width = 1; // Para que clearRect funcione con dimensiones mínimas
+        canvasEl.height = 1;
+    };
+
+    /**
+     * Configura las dimensiones del canvas para que coincidan con las de la imagen cargada.
+     * @param {HTMLCanvasElement} canvasEl - El elemento HTML canvas.
+     * @param {HTMLImageElement} image - La imagen cargada.
+     */
+    const setupCanvasDimensions = (canvasEl, image) => {
+        canvasEl.width = image.width;
+        canvasEl.height = image.height;
+        console.log('  Canvas dimensions set to:', canvasEl.width, 'x', canvasEl.height);
+    };
+
+    /**
+     * Limpia el canvas y dibuja la imagen proporcionada en él.
+     * @param {CanvasRenderingContext2D} ctx - El contexto 2D del canvas.
+     * @param {HTMLImageElement} image - La imagen a dibujar.
+     * @param {HTMLCanvasElement} canvasEl - El elemento HTML canvas.
+     */
+    const drawImageOnCanvas = (ctx, image, canvasEl) => {
+        ctx.clearRect(0, 0, canvasEl.width, canvasEl.height); // Limpia el canvas antes de dibujar
+        ctx.drawImage(image, 0, 0, canvasEl.width, canvasEl.height);
+        console.log('  Image drawn onto canvas. (Check for visual output now)');
+    };
+
+    /**
+     * Configura y devuelve las propiedades generales del texto para el meme.
+     * Estas propiedades incluyen color, estilo de trazo, alineación y cálculos
+     * para el ancho máximo del texto y el padding.
+     * La fuente específica (tamaño, familia) se establece justo antes de dibujar cada texto.
+     * @param {CanvasRenderingContext2D} ctx - El contexto 2D del canvas.
+     * @param {HTMLCanvasElement} canvasEl - El elemento HTML canvas.
+     * @returns {Object} Un objeto con propiedades de texto: fontFace, fontWeight, maxWidth, textPadding, referenceFontSize.
+     */
+    const configureTextProperties = (ctx, canvasEl) => {
+        const fontFace = 'Arial Black'; // Familia de fuente base para el texto del meme.
+        const fontWeight = 'bold';   // Peso de la fuente base.
+
+        ctx.fillStyle = 'white'; // Color de relleno del texto.
+        ctx.strokeStyle = 'black'; // Color del trazo (borde) del texto.
+
+        // Calcula un tamaño de fuente de referencia basado en la altura del canvas.
+        // Este se usa para cálculos proporcionales como el grosor del trazo y el padding.
+        const referenceFontSizeForCalcs = canvasEl.height * 0.1;
+        // El grosor del trazo es proporcional al tamaño de fuente de referencia, con un mínimo de 1px.
+        ctx.lineWidth = Math.max(1, referenceFontSizeForCalcs * 0.06);
+        ctx.textAlign = 'center'; // Alineación horizontal del texto.
+        ctx.textBaseline = 'alphabetic'; // Línea base vertical del texto.
+
+        return {
+            fontFace,
+            fontWeight,
+            maxWidth: canvasEl.width * 0.9, // Ancho máximo para el texto, 90% del ancho del canvas.
+            textPadding: canvasEl.height * 0.04, // Padding general relativo a la altura de la imagen.
+            referenceFontSize: referenceFontSizeForCalcs // Devuelve el tamaño de fuente de referencia para otros cálculos.
+        };
+    };
+
+    /**
+     * Función principal para dibujar el meme.
+     * Orquesta el manejo del estado sin imagen, la configuración del canvas,
+     * el dibujado de la imagen y la representación de los textos superior e inferior.
      */
     const drawMeme = () => {
         console.log('--- drawMeme() called ---');
         console.log('  Current image status:', currentImage);
 
         if (!currentImage) {
-            console.log('  No image loaded. Displaying "no image" message.');
-            noImageMessage.style.display = 'flex'; 
-            memeCanvas.style.display = 'none'; // Oculta el canvas
-            memePreview.classList.remove('has-image');
-            ctx.clearRect(0, 0, memeCanvas.width, memeCanvas.height);
-            // Aseguramos que el canvas esté en un estado base cuando no hay imagen
-            memeCanvas.width = 1; // Para que clearRect funcione con dimensiones mínimas
-            memeCanvas.height = 1;
+            handleNoImageState(ctx, memeCanvas, noImageMessage, memePreview);
             return;
         }
 
@@ -47,61 +124,64 @@ document.addEventListener('DOMContentLoaded', () => {
             return;
         }
 
-        // Establece el tamaño del canvas al tamaño de la imagen cargada
-        memeCanvas.width = currentImage.width;
-        memeCanvas.height = currentImage.height;
-        console.log('  Canvas dimensions set to:', memeCanvas.width, 'x', memeCanvas.height);
+        setupCanvasDimensions(memeCanvas, currentImage);
+        drawImageOnCanvas(ctx, currentImage, memeCanvas);
 
-        // Dibuja la imagen en el canvas
-        ctx.clearRect(0, 0, memeCanvas.width, memeCanvas.height); // Limpia el canvas antes de dibujar
-        ctx.drawImage(currentImage, 0, 0, memeCanvas.width, memeCanvas.height);
-        console.log('  Image drawn onto canvas. (Check for visual output now)');
+        const { fontFace, fontWeight, maxWidth, textPadding, referenceFontSize } = configureTextProperties(ctx, memeCanvas);
 
-        // --- Configuración y Estilo del Texto ---
-        const baseFontSize = memeCanvas.height * 0.1; 
-        const fontFace = 'Arial Black';
-        const fontWeight = 'bold';
+        // Obtener valores de los sliders
+        const currentTopTextSize = topTextSizeInput.value;
+        const currentBottomTextSize = bottomTextSizeInput.value;
 
-        ctx.font = `${fontWeight} ${baseFontSize}px ${fontFace}`;
-        ctx.fillStyle = 'white';
-        ctx.strokeStyle = 'black';
-        ctx.lineWidth = memeCanvas.width * 0.006;
-        ctx.textAlign = 'center';
-        ctx.textBaseline = 'alphabetic'; 
-
-        const textPadding = memeCanvas.height * 0.04; 
-        const maxWidth = memeCanvas.width * 0.9;     
-        const lineHeight = baseFontSize * 1.1;       
-
-        const topTextYOffset = baseFontSize * 0.9; 
+        // Posicionamiento del texto (puede seguir usando referenceFontSize o adaptarse a los nuevos tamaños)
+        // Usaremos referenceFontSize para el padding y el offset inicial para mantener consistencia relativa a la imagen
+        const topTextYOffset = referenceFontSize * 0.9; // Offset desde el padding
         const topTextY = textPadding + topTextYOffset;
 
-        const bottomTextYOffset = baseFontSize * 0.3; 
+        const bottomTextYOffset = referenceFontSize * 0.3; // Offset desde el borde inferior antes del padding
         const bottomTextBaseY = memeCanvas.height - textPadding - bottomTextYOffset;
 
         // Dibujar el texto superior
+        ctx.font = `${fontWeight} ${currentTopTextSize}px ${fontFace}`;
         const topTextContent = topText.value.toUpperCase();
-        console.log('  Drawing Top Text:', topTextContent, 'at Y:', topTextY);
-        drawWrappedText(ctx, topTextContent, memeCanvas.width / 2, topTextY, maxWidth, lineHeight, 'top');
+        console.log('  Drawing Top Text:', topTextContent, 'at Y:', topTextY, 'Size:', currentTopTextSize);
+        drawWrappedText(ctx, topTextContent, memeCanvas.width / 2, topTextY, maxWidth, parseFloat(currentTopTextSize), 'top');
 
         // Dibujar el texto inferior
+        ctx.font = `${fontWeight} ${currentBottomTextSize}px ${fontFace}`;
         const bottomTextContent = bottomText.value.toUpperCase();
-        console.log('  Drawing Bottom Text:', bottomTextContent, 'at Y:', bottomTextBaseY);
-        drawWrappedText(ctx, bottomTextContent, memeCanvas.width / 2, bottomTextBaseY, maxWidth, lineHeight, 'bottom');
+        console.log('  Drawing Bottom Text:', bottomTextContent, 'at Y:', bottomTextBaseY, 'Size:', currentBottomTextSize);
+        drawWrappedText(ctx, bottomTextContent, memeCanvas.width / 2, bottomTextBaseY, maxWidth, parseFloat(currentBottomTextSize), 'bottom');
+
         console.log('  Text drawn onto canvas.');
     };
 
     /**
      * Dibuja texto con salto de línea en el canvas, con soporte para alineación vertical.
+     * @param {CanvasRenderingContext2D} context - El contexto del canvas.
+     * @param {string} text - El texto a dibujar.
+     * @param {number} x - La coordenada X del centro del texto.
+     * @param {number} y - La coordenada Y para la primera línea (o base para la última si es 'bottom').
+     * @param {number} maxWidth - El ancho máximo permitido para el texto.
+     * @param {number} fontSize - El tamaño de la fuente en píxeles.
+     * @param {string} text - El texto a dibujar.
+     * @param {number} x - La coordenada X del centro del texto.
+     * @param {number} y - La coordenada Y para la primera línea (si verticalAlign es 'top') o la base para la última línea (si verticalAlign es 'bottom').
+     * @param {number} maxWidth - El ancho máximo permitido para el texto antes de que se divida en múltiples líneas.
+     * @param {number} fontSize - El tamaño de la fuente en píxeles.
+     * @param {'top' | 'bottom'} verticalAlign - Especifica si el texto se alinea desde la parte superior o inferior de su cuadro delimitador.
      */
-    function drawWrappedText(context, text, x, y, maxWidth, lineHeight, verticalAlign = 'top') {
+    function drawWrappedText(context, text, x, y, maxWidth, fontSize, verticalAlign = 'top') {
+        // Calcula la altura de línea basada en el tamaño de la fuente.
+        // Un multiplicador de 1.1 proporciona un espaciado estándar.
+        const lineHeight = fontSize * 1.1;
         const words = text.split(' ');
         let currentLine = '';
         const lines = [];
 
         for (let i = 0; i < words.length; i++) {
             const testLine = currentLine + words[i] + ' ';
-            const metrics = context.measureText(testLine);
+            const metrics = context.measureText(testLine); // measureText usa el ctx.font actual
             const testWidth = metrics.width;
 
             if (testWidth > maxWidth && i > 0) {
@@ -113,12 +193,16 @@ document.addEventListener('DOMContentLoaded', () => {
         }
         lines.push(currentLine.trim());
 
-        let startY = y; 
+        let startY = y;
 
         if (verticalAlign === 'bottom') {
-            startY = y - (lines.length - 1) * lineHeight;
+            // Si la alineación es inferior, ajusta startY para que la última línea de texto
+            // se dibuje en la coordenada 'y' especificada. Esto significa que 'y'
+            // actúa como la línea base de la última línea de texto.
+            startY = y - ((lines.length - 1) * lineHeight);
         }
 
+        // Dibuja cada línea de texto en el canvas.
         lines.forEach((line, index) => {
             const lineY = startY + (index * lineHeight);
             context.fillText(line, x, lineY);
@@ -126,66 +210,93 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // --- Event Listeners ---
+    // --- Manejadores de Eventos ---
+
+    /**
+     * Maneja el evento de cambio del input de carga de imagen.
+     * Lee el archivo seleccionado, lo carga como una imagen y luego llama a drawMeme.
+     * Gestiona la visibilidad del indicador de carga y los mensajes de error.
+     * @param {Event} e - El objeto evento del input.
+     */
     imageUpload.addEventListener('change', (e) => {
         const file = e.target.files[0];
         if (file) {
-            console.log('Event: file selected. File name:', file.name, 'File type:', file.type);
-            fileNameSpan.textContent = file.name; // Mostrar nombre del archivo
+            fileNameSpan.textContent = file.name; // Muestra el nombre del archivo seleccionado.
+            loadingIndicator.style.display = 'block'; // Muestra el indicador de carga.
+            noImageMessage.style.display = 'none'; // Oculta el mensaje de "no imagen".
+
             const reader = new FileReader();
             reader.onload = (event) => {
-                console.log('FileReader: onload triggered.');
                 const img = new Image();
                 img.onload = () => {
-                    console.log('Image object: onload triggered. Image dimensions (from img object):', img.width, 'x', img.height);
-                    currentImage = img;
-                    console.log('Image loaded successfully. Calling drawMeme().');
-                    drawMeme(); 
+                    currentImage = img; // Almacena la imagen cargada.
+                    loadingIndicator.style.display = 'none'; // Oculta el indicador de carga.
+                    drawMeme(); // Dibuja el meme con la nueva imagen.
                 };
                 img.onerror = () => {
-                    console.error('Image object: onerror triggered. Error loading image (corrupt or unsupported format).');
+                    // Manejo de error si la imagen no se puede cargar (ej. formato corrupto).
                     alert('No se pudo cargar la imagen. Asegúrate de que sea un formato de imagen válido (JPG, PNG, GIF).');
                     currentImage = null;
+                    loadingIndicator.style.display = 'none';
                     fileNameSpan.textContent = 'Error al cargar imagen.';
-                    drawMeme(); 
+                    drawMeme(); // Actualiza la UI para mostrar el estado "sin imagen".
                 };
-                img.src = event.target.result; // Establece el source de la imagen
-                console.log('Image object: img.src set to data URL.');
+                img.src = event.target.result; // Establece el source de la imagen para iniciar la carga.
             };
             reader.onerror = (error) => {
-                console.error('FileReader: onerror triggered. Error reading file:', error);
+                // Manejo de error si FileReader no puede leer el archivo.
+                console.error('FileReader error:', error);
                 alert('Error al leer el archivo. Intenta de nuevo.');
                 currentImage = null;
+                loadingIndicator.style.display = 'none';
                 fileNameSpan.textContent = 'Error de lectura de archivo.';
                 drawMeme();
             };
-            reader.readAsDataURL(file); // Lee el archivo como URL de datos
+            reader.readAsDataURL(file); // Inicia la lectura del archivo como Data URL.
         } else {
-            console.log('Event: no file selected. Resetting currentImage.');
+            // Si no se selecciona ningún archivo, resetea el estado.
             currentImage = null;
+            loadingIndicator.style.display = 'none';
             fileNameSpan.textContent = 'Ningún archivo seleccionado.';
-            drawMeme(); 
+            drawMeme();
         }
     });
 
+    // Event listeners para los inputs de texto y tamaño de fuente.
+    // Cada vez que cambian, se actualiza el meme.
     topText.addEventListener('input', drawMeme);
     bottomText.addEventListener('input', drawMeme);
 
+    topTextSizeInput.addEventListener('input', () => {
+        topTextSizeValue.textContent = `${topTextSizeInput.value}px`; // Actualiza el indicador visual del tamaño.
+        drawMeme();
+    });
+
+    bottomTextSizeInput.addEventListener('input', () => {
+        bottomTextSizeValue.textContent = `${bottomTextSizeInput.value}px`; // Actualiza el indicador visual del tamaño.
+        drawMeme();
+    });
+
+    /**
+     * Maneja el evento de clic del botón de descarga.
+     * Si hay una imagen cargada, convierte el contenido del canvas a Data URL PNG
+     * y lo descarga como un archivo 'mi-meme.png'.
+     */
     downloadMeme.addEventListener('click', () => {
         if (currentImage) {
-            console.log('Downloading meme...');
             const dataURL = memeCanvas.toDataURL('image/png');
             const link = document.createElement('a');
-            link.download = 'mi-meme.png'; 
+            link.download = 'mi-meme.png'; // Nombre del archivo a descargar.
             link.href = dataURL;
-            document.body.appendChild(link);
-            link.click(); 
-            document.body.removeChild(link);
+            document.body.appendChild(link); // Necesario para Firefox.
+            link.click();
+            document.body.removeChild(link); // Limpia el DOM.
         } else {
             alert('Por favor, carga una imagen antes de descargar el meme.');
         }
     });
 
+    // Dibuja el estado inicial del canvas (mensaje "no image") cuando la página carga.
     console.log('DOM Content Loaded. Initializing canvas state on page load.');
-    drawMeme(); // Llama a drawMeme al cargar la página para inicializar el estado
+    drawMeme();
 });
