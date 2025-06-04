@@ -1,12 +1,87 @@
-/* Variables (para una fácil modificación de colores) */
+/* Variables de Color para Light Mode (Default) */
 :root {
     --primary-color: #4CAF50;
     --secondary-color: #366d3a;
     --text-color: #333;
-    --bg-color: #f4f4f4;
+    --bg-color: #f4f4f4; /* Body background */
     --border-color: #ddd;
     --shadow-color: rgba(0, 0, 0, 0.1);
+
+    --header-bg-color: #fff;
+    --header-text-color: var(--primary-color);
+
+    --container-bg-color: #fff;
+    --container-text-color: var(--text-color);
+    --container-shadow-color: var(--shadow-color);
+    --container-border-color: var(--border-color); /* For meme-preview border */
+
+    --input-bg-color: #fff;
+    --input-text-color: var(--text-color); /* Color del texto dentro del input */
+    --input-border-color: var(--border-color);
+    --input-label-color: var(--secondary-color);
+
+    --button-bg-color: var(--primary-color);
+    --button-text-color: white;
+    --button-hover-bg-color: var(--secondary-color);
+
+    --meme-preview-bg-color: #f0f0f0; /* Fondo del área de previsualización */
+    --canvas-bg-color: #ccc; /* Background of canvas before image load */
+    --no-image-message-bg-color: #fff; /* Fondo del mensaje "no image" */
+    --no-image-message-text-color: #666;
+    --file-name-text-color: #666;
+
+    /* Colores para el indicador de carga (tomados del inline style previo) */
+    --loading-indicator-bg-color: rgba(255,255,255,0.8);
+    --loading-indicator-text-color: #333;
+
+    /* Colores para el botón de toggle (tomados del inline style previo) */
+    --toggle-button-bg-color: #eee;
+    --toggle-button-border-color: #ccc;
+    --toggle-button-text-color: #333; /* For the moon icon or text */
+    --toggle-button-hover-bg-color: #ddd;
 }
+
+/* Variables de Color para Dark Mode */
+body.dark-mode {
+    --primary-color: #66bb6a; /* Lighter green for dark bg */
+    --secondary-color: #4a9b4f; /* Adjusted secondary for dark */
+    --text-color: #e0e0e0; /* Light text for dark bg */
+    --bg-color: #121212;
+    --border-color: #444;
+    --shadow-color: rgba(255, 255, 255, 0.05); /* Sombra más clara para fondos oscuros */
+
+    --header-bg-color: #1e1e1e;
+    --header-text-color: var(--primary-color);
+
+    --container-bg-color: #1e1e1e;
+    --container-text-color: var(--text-color);
+    --container-shadow-color: var(--shadow-color);
+    --container-border-color: var(--border-color);
+
+    --input-bg-color: #2c2c2c;
+    --input-text-color: var(--text-color);
+    --input-border-color: #555;
+    --input-label-color: var(--secondary-color);
+
+    --button-bg-color: var(--primary-color);
+    --button-text-color: #121212; /* Texto oscuro en botones primarios claros */
+    --button-hover-bg-color: var(--secondary-color);
+
+    --meme-preview-bg-color: #2a2a2a;
+    --canvas-bg-color: #333;
+    --no-image-message-bg-color: #2c2c2c;
+    --no-image-message-text-color: #aaa;
+    --file-name-text-color: #aaa;
+
+    --loading-indicator-bg-color: rgba(30,30,30,0.8);
+    --loading-indicator-text-color: #e0e0e0;
+
+    --toggle-button-bg-color: #2c2c2c;
+    --toggle-button-border-color: #555;
+    --toggle-button-text-color: #e0e0e0;
+    --toggle-button-hover-bg-color: #444;
+}
+
 
 /* Aplicar border-box a todos los elementos para un modelo de caja predecible */
 *, *::before, *::after {
@@ -16,90 +91,96 @@
 body {
     font-family: 'Arial', sans-serif;
     display: flex;
-    flex-direction: column; /* Cambiado a columna para apilar header y container */
-    justify-content: flex-start; /* Alinea al inicio verticalmente */
-    align-items: center; /* Centra horizontalmente el contenido */
-    min-height: 100vh; /* Asegura que el body siempre ocupe toda la altura del viewport */
+    flex-direction: column;
+    justify-content: flex-start;
+    align-items: center;
+    min-height: 100vh;
     margin: 0;
     background-color: var(--bg-color);
     color: var(--text-color);
-    padding: 20px; /* Padding general para el body */
+    padding: 20px;
+    transition: background-color 0.3s ease, color 0.3s ease; /* Transición suave para dark mode */
 }
 
 /* --- Nuevo estilo para el header de la app --- */
 .app-header {
     width: 100%;
-    max-width: 1200px; /* Ancho máximo igual al container para alineación */
+    max-width: 1200px;
     text-align: center;
     padding: 20px;
-    margin-bottom: 20px; /* Espacio entre el header y el container */
-    background-color: #fff;
+    margin-bottom: 20px;
+    background-color: var(--header-bg-color);
     border-radius: 10px;
-    box-shadow: 0 2px 10px var(--shadow-color);
+    box-shadow: 0 2px 10px var(--container-shadow-color); /* Usar container-shadow para consistencia */
 }
 
 .app-header h1 {
-    color: var(--primary-color);
-    margin: 0; /* Elimina márgenes extra del h1 dentro del header */
-    font-size: 2.5em; /* Ajusta el tamaño del título */
+    color: var(--header-text-color);
+    margin: 0;
+    font-size: 2.5em;
 }
 
 .container {
-    background-color: #fff;
+    background-color: var(--container-bg-color);
     padding: 30px;
     border-radius: 10px;
-    box-shadow: 0 4px 15px var(--shadow-color);
+    box-shadow: 0 4px 15px var(--container-shadow-color);
     width: 100%;
-    max-width: 1200px; /* Ancho máximo para el layout de dos columnas */
-    text-align: center; /* Mantener por si hay contenido centrado no flex */
+    max-width: 1200px;
+    text-align: center;
     display: flex;
-    flex-direction: column; /* Apilado por defecto (móvil) */
-    gap: 30px; /* Espacio entre secciones */
+    flex-direction: column;
+    gap: 30px;
 }
 
 .meme-preview {
     position: relative;
     width: 100%;
     margin: 0 auto;
-    border: 2px dashed var(--border-color);
+    border: 2px dashed var(--container-border-color); /* Usar --container-border-color */
     border-radius: 5px;
-    overflow: hidden; /* Importante para que la imagen no se desborde si el canvas es más grande */
-    min-height: 300px; /* Altura mínima para que sea visible en móvil */
-    background-color: #f0f0f0;
-
-    display: flex; /* Para centrar el contenido (canvas o mensaje) */
+    overflow: hidden;
+    min-height: 300px;
+    background-color: var(--meme-preview-bg-color);
+    display: flex;
     justify-content: center;
     align-items: center;
 }
 
 #memeCanvas {
-    display: none; /* Oculto por defecto, se mostrará con .has-image */
-    max-width: 100%; /* El canvas nunca debe ser más ancho que su contenedor */
-    height: auto; /* Mantiene la relación de aspecto */
-    width: 100%; /* El canvas debe ocupar todo el ancho disponible de su contenedor */
-    min-height: 100px; /* Altura mínima para el canvas mismo, por si el JS tarda */
-    background-color: #ccc; /* Fondo temporal para el canvas, debería desaparecer con imagen */
+    display: none;
+    max-width: 100%;
+    height: auto;
+    width: 100%;
+    min-height: 100px;
+    background-color: var(--canvas-bg-color);
 }
 
 #noImageMessage {
     padding: 20px;
-    color: #666;
-    background-color: #fff;
+    color: var(--no-image-message-text-color);
+    background-color: var(--no-image-message-bg-color);
     text-align: center;
-
-    position: absolute; /* Para que cubra el canvas cuando no hay imagen */
+    position: absolute;
     top: 0;
     left: 0;
     width: 100%;
     height: 100%;
-
-    display: flex; /* Para centrar el texto del mensaje */
+    display: flex;
     justify-content: center;
     align-items: center;
-    pointer-events: none; /* Permite hacer clic a través del mensaje si es necesario */
-    z-index: 2; /* Asegurar que esté por encima del canvas */
-    opacity: 1; /* Forzar la opacidad para asegurar visibilidad */
-    visibility: visible; /* Forzar la visibilidad */
+    pointer-events: none;
+    z-index: 2;
+    opacity: 1;
+    visibility: visible;
+}
+
+/* Estilos para el Indicador de Carga */
+#loadingIndicator {
+    background-color: var(--loading-indicator-bg-color);
+    color: var(--loading-indicator-text-color);
+    /* Otros estilos como padding, border-radius, position, etc., se mantienen inline en el HTML
+       ya que son primariamente para layout y no cambian con el tema. */
 }
 
 /* Reglas de visibilidad controladas por JS:
@@ -111,7 +192,7 @@ body {
 }
 
 .meme-preview.has-image #memeCanvas {
-    background-color: transparent; /* Quitar fondo temporal cuando hay imagen */
+    background-color: transparent;
     display: block;
 }
 
@@ -130,25 +211,38 @@ body {
     display: block;
     margin-bottom: 5px;
     font-weight: bold;
-    color: var(--secondary-color);
+    color: var(--input-label-color);
 }
 
-.input-group input {
+.input-group input[type="text"],
+.input-group input[type="file"] { /* Aplicar a inputs específicos si es necesario */
     width: 100%;
     padding: 10px;
-    border: 1px solid var(--border-color);
+    border: 1px solid var(--input-border-color);
+    background-color: var(--input-bg-color);
+    color: var(--input-text-color);
     border-radius: 5px;
     box-sizing: border-box;
 }
+/* Estilos para los range inputs (pueden necesitar ajustes más específicos para el thumb y track) */
+.input-group input[type="range"] {
+    width: 100%; /* Ocupa el ancho disponible */
+    padding: 10px 0; /* Ajusta el padding vertical, horizontal es menos relevante para el track */
+    background-color: transparent; /* El fondo del track suele ser transparente o personalizado */
+    /* Los estilos de los range son complejos y varían por navegador.
+       Aquí se pueden añadir estilos para el track y el thumb si se desea,
+       pero por ahora se deja simple para heredar colores o ser neutral. */
+}
+
 
 /* --- Estilo específico para input de tipo file --- */
 .input-group input#imageUpload {
-    display: none; /* Ocultar el input real */
+    display: none;
 }
 
 .input-group .file-upload-button {
-    background-color: var(--primary-color);
-    color: white;
+    background-color: var(--button-bg-color); /* Usa variables de botón */
+    color: var(--button-text-color);
     padding: 12px 20px;
     border: none;
     border-radius: 5px;
@@ -167,20 +261,21 @@ body {
 }
 
 .input-group .file-upload-button:hover {
-    background-color: var(--secondary-color);
+    background-color: var(--button-hover-bg-color);
 }
 
 .file-name {
     display: block;
     font-size: 0.9em;
-    color: #666;
+    color: var(--file-name-text-color);
     margin-top: 10px;
     word-wrap: break-word;
 }
 
-button {
-    background-color: var(--primary-color);
-    color: white;
+/* Estilo para el botón de descarga general */
+button#downloadMeme { /* Ser más específico si es necesario */
+    background-color: var(--button-bg-color);
+    color: var(--button-text-color);
     padding: 12px 20px;
     border: none;
     border-radius: 5px;
@@ -190,9 +285,31 @@ button {
     width: 100%;
 }
 
-button:hover {
-    background-color: var(--secondary-color);
+button#downloadMeme:hover {
+    background-color: var(--button-hover-bg-color);
 }
+
+/* Estilos para el botón de Dark Mode Toggle */
+#darkModeToggle {
+    position: absolute;
+    top: 20px; /* Ajustado para posible padding del header */
+    left: 20px; /* Ajustado para posible padding del header */
+    z-index: 1000;
+    padding: 8px 12px;
+    background-color: var(--toggle-button-bg-color);
+    color: var(--toggle-button-text-color);
+    border: 1px solid var(--toggle-button-border-color);
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 1.2em; /* Para el icono emoji */
+    line-height: 1; /* Mejor alineación del emoji */
+    transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease;
+}
+
+#darkModeToggle:hover {
+    background-color: var(--toggle-button-hover-bg-color);
+}
+
 
 /* --- Media Queries para Responsividad --- */
 

@@ -16,6 +16,8 @@ document.addEventListener('DOMContentLoaded', () => {
     const bottomTextSizeInput = document.getElementById('bottomTextSize');
     const bottomTextSizeValue = document.getElementById('bottomTextSizeValue');
 
+    const darkModeToggle = document.getElementById('darkModeToggle'); // Botón para Dark Mode
+
     const ctx = memeCanvas.getContext('2d');
 
     let currentImage = null; // Variable para almacenar la imagen cargada actualmente.
@@ -299,4 +301,48 @@ document.addEventListener('DOMContentLoaded', () => {
     // Dibuja el estado inicial del canvas (mensaje "no image") cuando la página carga.
     console.log('DOM Content Loaded. Initializing canvas state on page load.');
     drawMeme();
+
+    // --- Lógica para Dark Mode ---
+    const K_CURRENT_THEME = 'memeGeneratorTheme'; // Key para localStorage
+
+    /**
+     * Aplica el tema (dark/light) al body y actualiza el texto del botón de toggle.
+     * @param {string} theme - El tema a aplicar ("dark" o "light").
+     */
+    function applyTheme(theme) {
+        if (theme === 'dark') {
+            document.body.classList.add('dark-mode');
+            if (darkModeToggle) darkModeToggle.textContent = '☀️'; // Sun emoji for light mode switch
+        } else {
+            document.body.classList.remove('dark-mode');
+            if (darkModeToggle) darkModeToggle.textContent = '🌙'; // Moon emoji for dark mode switch
+        }
+    }
+
+    // Verifica si hay un tema guardado en localStorage al cargar la página.
+    const savedTheme = localStorage.getItem(K_CURRENT_THEME);
+    if (savedTheme) {
+        applyTheme(savedTheme);
+    } else {
+        // Opcional: Podría comprobar las preferencias del sistema aquí.
+        // Por ahora, se establece 'light' como tema por defecto si no hay nada guardado.
+        applyTheme('light'); // Tema por defecto.
+    }
+
+    // Event listener para el botón de toggle del modo oscuro.
+    if (darkModeToggle) {
+        darkModeToggle.addEventListener('click', () => {
+            let newTheme;
+            // Determina el nuevo tema basado en la clase actual del body.
+            if (document.body.classList.contains('dark-mode')) {
+                newTheme = 'light';
+            } else {
+                newTheme = 'dark';
+            }
+            applyTheme(newTheme); // Aplica el nuevo tema.
+            localStorage.setItem(K_CURRENT_THEME, newTheme); // Guarda la preferencia.
+        });
+    } else {
+        console.warn('Dark mode toggle button #darkModeToggle not found.');
+    }
 });
