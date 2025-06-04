@@ -72,7 +72,7 @@ document.addEventListener('DOMContentLoaded', () => {
      * @returns {Object} Un objeto con propiedades de texto: fontFace, fontWeight, maxWidth, textPadding, referenceFontSize.
      */
     const configureTextProperties = (ctx, canvasEl) => {
-        const fontFace = 'Arial Black'; // Familia de fuente base para el texto del meme.
+        const fontFace = 'Arial'; // Familia de fuente base para el texto del meme.
         const fontWeight = 'bold';   // Peso de la fuente base.
 
         ctx.fillStyle = 'white'; // Color de relleno del texto.
