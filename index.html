@@ -9,12 +9,13 @@
 <body>
 
     <header class="app-header">
+        <button id="darkModeToggle" title="Toggle Dark Mode">🌙</button>
         <h1>Generador de Memes</h1>
     </header>
 
     <div class="container">
         <div class="meme-preview">
-            <div id="loadingIndicator" style="display: none; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); z-index: 3; background-color: rgba(255,255,255,0.8); padding: 20px; border-radius: 5px;">Loading image...</div>
+            <div id="loadingIndicator" style="display: none; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); z-index: 3; padding: 20px; border-radius: 5px;">Loading image...</div>
             <canvas id="memeCanvas"></canvas>
             <div id="noImageMessage">Carga una imagen para empezar</div>
         </div>
